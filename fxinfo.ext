@@ -1,1 +1,71 @@
-__external enum fxstr : uint32_t; // Magic to use the adjacent .fxstr file to resolve hashes.struct DATAPARMv1 __transparent {  struct {    __label("%s", hash);    fxstr hash;    uint32_t unknown[5];  } _elements[];};struct DATATECHv8 __transparent {  struct {    __label("#%d: %s (%s [%d,%d])", _t, hash, second_hash, unknown5, unknown3);    fxstr hash;    fxstr second_hash;    uint32_t _unknown1 = 1;    uint32_t _unknown2 = 0;    uint32_t  unknown3;    uint32_t _unknown4 = 0;    uint32_t  unknown5;    uint32_t _unknown6 = 8;    uint32_t _num_passes;    uint32_t _prop_count;    uint32_t  primary_technique;    struct {      __label("primary variant %d: #%d", _i, technique_id);      int16_t technique_id;      uint16_t unknown = 0;    } _primary_variants[7 as _i];    struct {      __label("#%d", _p);      uint32_t unknown = 24;      uint32_t _child_count;      uint8_t unknown[444];      struct {        __label("%s", hash);        fxstr hash;        uint32_t zero = 0;        uint32_t fst = 65535;        uint32_t snd = 65535;        uint32_t unknown;        uint32_t third = 65535;        uint32_t fourth = 65535;        uint32_t fifth = 65535;        uint8_t final = 1;      } children[_child_count];    } passes[_num_passes as _p];    struct {      __label("%s", hash);      fxstr hash;      uint32_t data_type;      uint32_t _value_len;      uint8_t value[_value_len];    } props[_prop_count];  } techniques[as _t];};
+__external enum fxstr : uint32_t; // Magic to use the adjacent .fxstr file to resolve hashes.
+
+enum DataType : uint32_t {
+  int = 0,
+  float = 1,
+  float2 = 3,
+  float3 = 4,
+  float4 = 5,
+  float4x3 = 7,
+  float4x4 = 8,
+  texture = 9,
+};
+
+struct DATAPARMv1 __transparent {
+  struct {
+    __label("%s %s[%u]", data_type, hash, array_size);
+    fxstr hash;
+    DataType data_type;
+    uint32_t array_size;
+    uint32_t byte_offset;
+    uint32_t unknown1;
+    uint32_t unknown2;
+  } _elements[];
+};
+
+struct DATATECHv8 __transparent {
+  struct {
+    __label("#%d: %s (%s [%d,%d])", _t, hash, second_hash, unknown5, unknown3);
+    fxstr hash;
+    fxstr second_hash;
+    uint32_t _unknown1 = 1;
+    uint32_t _unknown2 = 0;
+    uint32_t  unknown3;
+    uint32_t _unknown4 = 0;
+    uint32_t  unknown5;
+    uint32_t _unknown6 = 8;
+    uint32_t _num_passes;
+    uint32_t _prop_count;
+    uint32_t  primary_technique;
+    struct {
+      __label("primary variant %d: #%d", _i, technique_id);
+      int16_t technique_id;
+      uint16_t unknown = 0;
+    } _primary_variants[7 as _i];
+    struct {
+      __label("#%d", _p);
+      uint32_t unknown = 24;
+      uint32_t _child_count;
+      uint8_t unknown[444];
+      struct {
+        __label("%s", hash);
+        fxstr hash;
+        uint32_t zero = 0;
+        uint32_t fst = 65535;
+        uint32_t snd = 65535;
+        uint32_t unknown;
+        uint32_t third = 65535;
+        uint32_t fourth = 65535;
+        uint32_t fifth = 65535;
+        uint8_t final = 1;
+      } children[_child_count];
+    } passes[_num_passes as _p];
+    struct {
+      __label("%s", hash);
+      fxstr hash;
+      uint32_t data_type;
+      uint32_t _value_len;
+      uint8_t value[_value_len];
+    } props[_prop_count];
+  } techniques[as _t];
+};
