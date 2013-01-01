@@ -1,0 +1,145 @@
+struct FOLDTSETv1 > DATADATAv3 __transparent {
+  uint32_t _filename_len;
+  char filename[_filename_len];
+  uint32_t unknown;
+};
+
+// FOLDMGRP
+/*
+  Has N children of type FOLDMESH, and then N children of type DATANODE.
+  The enclosing FOLDMODL will have N FOLDMTRLs.
+  These three lists of N elements zip together.
+*/
+
+struct FOLDMRGMv3 > DATADATAv8 #0 __transparent {
+  uint8_t unknown;
+  uint32_t _num_objects;
+  struct {
+    uint32_t _num_indicies;
+    uint16_t indicies[_num_indicies];
+    float unknown[3];
+    uint8_t unknown;
+    uint32_t _name_len;
+    char _name[_name_len];
+  } objects[_num_objects];
+  uint32_t _num_input_layout_elements;
+  struct {
+    uint32_t semantic;
+    uint32_t version;
+    uint32_t datatype;
+    __label("%d %d %d", semantic, version, datatype);
+  } input_layout_elements[_num_input_layout_elements];
+  uint32_t num_verticies;
+  uint32_t vertex_stride;
+  uint8_t verticies[vertex_stride][num_verticies];
+  uint32_t unknown;
+  uint32_t _mtrl_name_len;
+  char mtrl_name[_mtrl_name_len];
+  uint32_t _num_bones;
+  struct {
+    float matrix[3][4];
+    float inverse_matrix[3][4];
+    uint32_t _name_len;
+    char _name[_name_len];
+  } bones[_num_bones];
+  // The DATADATAv8 will have a sibling called FOLDBIMPv1000, which will have _num_bones DATAIDXLv1000 children, which zip with these bones.
+  uint8_t unknown[5];
+};
+
+struct DATABVOLv2 __transparent {
+  uint8_t has_bvol;
+  switch(has_bvol) {
+  case 0:
+    // No further fields
+  case 1:
+    float extents[3];
+    float matrix[3][4];
+  }
+};
+
+struct FOLDMGRPv1 > DATANODEv1 __transparent {
+  uint32_t _str1_len;
+  char str1[_str1_len];
+  uint32_t _str2_len;
+  char str2[_str2_len];
+  uint32_t _bone_name_len;
+  char _bone_name[_bone_name_len];
+  float matrix[3][4];
+};
+
+struct DATAIDXLv1000 __transparent {
+  uint32_t _num_indicies;
+  uint16_t indicies[_num_indicies];
+};
+
+struct FOLDSKELv3 > DATAINFOv1 __transparent {
+  uint32_t bone_count;
+};
+
+struct Property {
+  uint32_t _key_len;
+  char key[_key_len];
+  uint32_t data_type;
+  switch(data_type) {
+  case 0:
+    int32_t value;
+  case 1:
+    float value;
+  case 10:
+    uint8_t value;
+  case 11:
+    uint32_t _value_len;
+    char value[_value_len];
+  default:
+    uint32_t unknown = "TODO";
+  }
+};
+
+struct FOLDSKELv3 > DATABONEv7 __transparent {
+  int32_t parent;
+  int32_t unknown;
+  float matrix[3][4];
+  uint32_t unknown;
+  uint32_t _num_properties;
+  Property properties[_num_properties];
+};
+
+struct FOLDMTRLv1 > DATAINFOv1 __transparent {
+  uint32_t _shader_name_len;
+  char shader_name[_shader_name_len];
+};
+
+struct FOLDMTRLv1 > DATAVARv1 __transparent {
+  uint32_t _key_len;
+  char key[_key_len];
+  uint32_t data_type;
+  switch(data_type) {
+  case 9: // ASCIIZ or D3DX11Effects::EObjectType::EOT_Texture
+    uint32_t _value_len;
+    char value[_value_len];
+  }
+};
+
+struct FOLDMODLv1 > DATAINFOv1 __transparent {
+  uint16_t unknown;
+  uint32_t tset_count;
+  uint32_t mtrl_count;
+  uint32_t unknown1;
+  uint32_t unknown2;
+  uint32_t unknown3_large;
+  uint32_t unknown4;
+  uint16_t unknown;
+};
+
+struct FOLDMODLv1 > DATAMRKSv1 __transparent {
+  uint32_t _num_markers;
+  struct {
+    uint32_t _name_len;
+    char _name[_name_len];
+    uint32_t _bone_name_len;
+    char bone_name[_bone_name_len];
+    float matrix[3][4];
+    uint32_t _num_properties;
+    Property properties[_num_properties];
+  } _markers[_num_markers];
+};

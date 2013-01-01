@@ -1,0 +1,1 @@
+struct DATADICTv1 __transparent {  uint32_t _num_entries;  struct {    uint32_t hash;    uint32_t _str_len;    char str[_str_len];    __label("0x%08x = %s", hash, str);  } _entries[_num_entries];};

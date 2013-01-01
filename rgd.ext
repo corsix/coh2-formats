@@ -1,0 +1,30 @@
+struct DATAAEGDv1 __transparent {
+  uint32_t  contents_crc;
+  uint32_t _contents_size;
+  uint8_t   contents[_contents_size] __interpret_as("Table");
+};
+
+__external enum rgdhash : uint32_t;
+
+struct Table {
+  uint32_t _num_entries;
+  struct {
+    __label("%s", hash);
+    rgdhash   hash;
+    uint32_t  data_type;
+    uint32_t _data_offset;
+    
+    __byte_offset(&_entry_data, _data_offset);
+    switch(data_type) {
+    case   0: float   value;
+    case   1: int32_t value;
+    case   2: uint8_t value;
+    case   3: char    value[__terminator(0)];
+    case   4: wchar_t value[__terminator(0)];
+    case 100: Table   children;
+    case 101: Table   list_entries;
+    }
+    __byte_offset(&_data_offset, 4);
+  } _entries[_num_entries];
+  uint8_t _entry_data[0];
+};

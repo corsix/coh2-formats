@@ -1,0 +1,47 @@
+struct RelicChunk {
+  char _kind[4];
+  char _type[4];
+  uint32_t _version;
+  uint32_t _data_size;
+  uint32_t _name_size;
+   int32_t _unknown;
+  uint32_t _unknown = 0;
+  char _name[_name_size];
+  __label("%s%s v%d %s (%d bytes)", _kind, _type, _version, _name, _data_size);
+  switch(_kind) {
+  case "FOLD":
+    __id("%s%sv%d", _kind, _type, _version);
+    uint8_t _data[_data_size] __interpret_as("RelicChunk[]");
+  default:
+    uint8_t data[_data_size] __interpret_as("%s%sv%d", _kind, _type, _version);
+  }
+};
+
+struct RelicChunkyFile __autodetect {
+  char _signature[12] = "Relic Chunky";
+  uint32_t _signature2 = 1706509;
+  uint32_t _version = 3;
+  uint32_t _unknown = 1;
+  uint32_t _data_offset;
+  uint32_t _unknown;
+  uint32_t _unknown = 1;
+  __byte_offset(&_signature, _data_offset);
+  uint8_t _chunks[] __interpret_as("RelicChunk[]");
+};
+
+struct DATAFBIFv2 __transparent {
+  uint32_t _burner_name_len;
+  char burner_name[_burner_name_len];
+  uint32_t burner_version;
+  uint32_t _username_len;
+  char username[_username_len];
+  uint32_t _date_len;
+  char date[_date_len];
+  uint32_t _file_count;
+  struct {
+    uint32_t _filename_len;
+    char filename[_filename_len];
+    uint32_t unknown; // Possibly the P4 revision number of the file?
+    uint32_t timestamp;
+  } files[_file_count];
+};

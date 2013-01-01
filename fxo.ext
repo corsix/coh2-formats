@@ -1,0 +1,289 @@
+struct DATASPFFv8 __transparent {
+  uint32_t _num_shaders;
+  struct {
+    uint32_t _size;
+    uint32_t shader_bytecode_crc;
+    uint32_t _size_again = _size;
+    switch(_size) {
+    case 0:
+      __label("NULL shader");
+    default:
+      uint8_t shader_bytecode[_size] __interpret_as("DirectXShader");
+    }
+    __label("#%d", _i);
+  } shaders[_num_shaders as _i];
+  uint32_t _num_techniques;
+  struct {
+    uint32_t _num_passes;
+    struct {
+      uint32_t vs_index;
+      uint32_t gs_index;
+      uint32_t ps_index;
+      uint32_t hs_index;
+      uint32_t ds_index;
+      uint32_t _cs_index = 0;
+      __label("#%d (pass %d): VS=#%d, HS=#%d, DS=#%d, GS=#%d, PS=#%d", _i, _j, vs_index, hs_index, ds_index, gs_index, ps_index);
+    } _passes[_num_passes as _j];
+  } techniques[_num_techniques as _i];
+};
+
+struct DATASPFFv7 __transparent {
+  struct {
+    uint32_t _num_shaders;
+    struct {
+      uint32_t _size;
+      uint32_t shader_bytecode_crc;
+      uint32_t _size_again = _size;
+      switch(_size) {
+      case 0:
+        __label("NULL shader");
+      default:
+        uint8_t shader_bytecode[_size] __interpret_as("DirectXShader");
+      }
+      __label("#%d.%d", _type, _i);
+    } shaders[_num_shaders as _i];
+  } shaders_by_type[6 as _type];
+  uint32_t _num_effects;
+  struct {
+    uint32_t _num_passes;
+    struct {
+      uint32_t vs_index;
+      uint32_t gs_index;
+      uint32_t ps_index;
+      uint32_t hs_index;
+      uint32_t ds_index;
+      uint32_t _cs_index = 0;
+      __label("#%d (pass %d): VS=#0.%d, HS=#3.%d, DS=#4.%d, GS=#1.%d, PS=#2.%d", _i, _j, vs_index, hs_index, ds_index, gs_index, ps_index);
+    } _passes[_num_passes as _j];
+  } effects[_num_effects as _i];
+};
+
+// The following definitions are for taking apart DirectX shader bytecode.
+// Note that while nice, a more useful disassembly is produced by "fxc.exe /dumpbin".
+// References:
+//  https://github.com/tgjones/slimshader
+//  https://devel.nuclex.org/framework/browser/graphics/Nuclex.Graphics.Native/trunk/Source/Introspection/HlslShaderReflector.cpp
+//  http://source.winehq.org/source/dlls/d3dcompiler_43/reflection.c
+
+struct DirectXShader {
+  uint32_t _signature = "DXBC";
+  uint32_t guid[4];
+  uint32_t _version = 1;
+  uint32_t _size;
+  uint32_t _num_chunks;
+  struct __transparent {
+    uint32_t _chunk_offset;
+    __byte_offset(&_signature, _chunk_offset);
+    char _chunk_type[4];
+    uint32_t _size;
+    uint8_t data[_size] __interpret_as("Shader%s", _chunk_type);
+    __byte_offset(&_chunk_offset, 4);
+  } _chunks[_num_chunks];
+  __byte_offset(&_signature, _size);
+};
+
+enum RegisterType : uint32_t { // D3D_REGISTER_COMPONENT_TYPE
+   uint4 = 1,
+    int4 = 2,
+  float4 = 3,
+};
+
+struct ShaderISGN {
+  __label("Input Signature");
+  uint32_t _elements_count;
+  uint32_t _elements_offset;
+  __byte_offset(&_elements_count, _elements_offset);
+  struct {
+    uint32_t _semantic_offset;
+    uint32_t _semantic_index;
+    uint32_t builtin_semantic;
+    RegisterType _type;
+    int32_t _register_index;
+    uint32_t used_mask;
+    __byte_offset(&_elements_count, _semantic_offset);
+    char _semantic[__terminator(0)];
+    __label("%s r%d: %s %d", _type, _register_index, _semantic, _semantic_index);
+    __byte_offset(&used_mask, 4);
+  } _elements[_elements_count];
+};
+
+struct ShaderOSGN : ShaderISGN {
+  __label("Output Signature");
+};
+
+struct ShaderPCSG : ShaderISGN {
+  __label("Patch Constant Signature");
+};
+
+enum ShaderVersionSHDR : uint16_t {
+  "4.0" = 64,
+  "5.0" = 80,
+};
+
+enum ShaderTypeSHDR : uint16_t {
+  PS = 0,
+  VS = 1,
+  GS = 2,
+  HS = 3,
+  DS = 4,
+  CS = 5,
+};
+
+struct ShaderSHDR {
+  __label("%s %s Shader Instructions", _type, _version);
+  ShaderVersionSHDR _version;
+  ShaderTypeSHDR _type;
+  uint32_t length;
+  uint32_t opcodes[];
+};
+
+struct ShaderSHEX : ShaderSHDR {
+};
+
+struct ShaderSTAT {
+  __label("Statistics");
+  uint32_t instruction_count;
+  uint32_t temp_register_count;
+  uint32_t define_count;
+  uint32_t dcl_count;
+  uint32_t float_instruction_count;
+  uint32_t   int_instruction_count;
+  uint32_t  uint_instruction_count;
+  uint32_t  static_flow_control_count;
+  uint32_t dynamic_flow_control_count;
+  uint32_t macro_instruction_count;
+  uint32_t temp_array_count;
+  uint32_t array_instruction_count;
+  uint32_t cut_instruction_count;
+  uint32_t emit_instruction_count;
+  uint32_t texture_normal_instructions;
+  uint32_t texture_load_instructions;
+  uint32_t texture_comp_instructions;
+  uint32_t texture_bias_instructions;
+  uint32_t texture_gradient_instructions;
+  uint32_t mov_instruction_count;
+  uint32_t movc_instruction_count;
+  uint32_t conversion_instruction_count;
+  uint32_t unknown;
+  uint32_t input_primitive;
+  uint32_t gs_output_topology;
+  uint32_t gs_max_output_vertex_count;
+  uint32_t unknown[3];
+  // NB: DX11 has some more fields.
+};
+
+enum CBufferType : uint32_t { // D3D_CBUFFER_TYPE
+  struct = 0,
+  texture = 1,
+  interface_pointers = 2,
+  resource_bind_info = 3,
+};
+
+enum ShaderInputType : uint32_t { // D3D_SHADER_INPUT_TYPE
+  cbuffer = 0,
+  tbuffer = 1,
+  texture = 2,
+  sampler = 3,
+  uav_rw_typed = 4,
+  structured = 5,
+  uav_rw_structured = 6,
+  byteaddress = 7,
+  uav_rw_byteaddress = 8,
+  uav_append_structured = 9,
+  uav_consume_structured = 10,
+  uav_rw_structured_with_counter = 11,
+};
+
+enum ResourceReturnType : uint32_t { // D3D11_RESOURCE_RETURN_TYPE
+  "" = 0,
+  "<unorm>" = 1,
+  "<snorm>" = 2,
+  "<sint>" = 3,
+  "<uint>" = 4,
+  "<float>" = 5,
+  "<mixed>" = 6,
+  "<double>" = 7,
+  "<high-bits-of-previous>" = 8,
+};
+
+enum ShaderTypeRDEF : uint16_t {
+  PS = 65535,
+  VS = 65534,
+  GS = 18259,
+  HS = 18515,
+  DS = 17491,
+  CS = 17235,
+};
+
+struct ShaderRDEF {
+  __label("%s %d.%d Resource Definition", _shader_type, _shader_model_major, _shader_model_minor);
+  uint32_t _cbuf_count;
+  uint32_t _cbuf_offset;
+  uint32_t _resbindings_count;
+  uint32_t _resbindings_offset;
+  uint8_t _shader_model_minor;
+  uint8_t _shader_model_major;
+  ShaderTypeRDEF _shader_type;
+  uint32_t compile_flags;
+  uint32_t _creator_offset;
+  switch(_shader_model_major) {
+  case 5:
+    uint32_t _signature = "RD11";
+    uint32_t unknown[7];
+  }
+  __byte_offset(&_cbuf_count, _creator_offset);
+  char creator[__terminator(0)];
+  __byte_offset(&_cbuf_count, _cbuf_offset);
+  struct {
+    uint32_t _name_offset;
+    uint32_t _variables_count;
+    uint32_t _variables_offset;
+    uint32_t byte_size;
+    uint32_t flags; // D3D_SHADER_CBUFFER_FLAGS
+    CBufferType _type;
+    __byte_offset(&_cbuf_count, _name_offset);
+    char _name[__terminator(0)];
+    __label("%s %s", _type, _name);
+    __byte_offset(&_cbuf_count, _variables_offset);
+    struct {
+      uint32_t _name_offset;
+      uint32_t byte_offset;
+      uint32_t byte_size;
+      uint32_t flags; // D3D_SHADER_VARIABLE_FLAGS
+      uint32_t type_offset;
+      uint32_t _default_value_offset;
+      __byte_offset(&_cbuf_count, _name_offset);
+      char _name[__terminator(0)];
+      switch(_default_value_offset) {
+      case 0:
+      default:
+        __byte_offset(&_cbuf_count, _default_value_offset);
+        uint8_t default_value[byte_size];
+      }
+      __byte_offset(&_default_value_offset, 4);
+      switch(_shader_model_major) {
+      case 5:
+        uint32_t first_texture;
+        uint32_t texture_count;
+        uint32_t first_sampler;
+        uint32_t sampler_count;
+      }
+    } variables[_variables_count];
+    __byte_offset(&_type, 4);
+  } constant_buffers[_cbuf_count];
+  __byte_offset(&_cbuf_count, _resbindings_offset);
+  struct {
+    uint32_t _name_offset;
+    ShaderInputType _type;
+    ResourceReturnType _return_type;
+    uint32_t srv_dimension; // D3D_SRV_DIMENSION
+    uint32_t multisample_count;
+    uint32_t first_slot;
+    uint32_t slot_count;
+    uint32_t flags;
+    __byte_offset(&_cbuf_count, _name_offset);
+    char _name[__terminator(0)];
+    __label("%s%s %s", _type, _return_type, _name);
+    __byte_offset(&flags, 4);
+  } resbindings[_resbindings_count];
+};
