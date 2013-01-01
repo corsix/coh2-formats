@@ -1,0 +1,29 @@
+struct DATABPDTv24 __transparent {
+  uint32_t _str_len;
+  char str[_str_len];
+};
+
+struct DATABPDTv25 __transparent : DATABPDTv24 {
+};
+
+struct FOLDCSTAv24 > DATADMMYv24 __transparent {
+  uint32_t signature = "YMMD";
+};
+
+struct FOLDCSTAv25 > DATADMMYv25 __transparent {
+  uint32_t signature = "YMMD";
+};
+
+struct DATAGRBIv24 __transparent {
+  uint32_t _name_len;
+  char name[_name_len];
+  uint32_t _child_count;
+  struct {
+    uint32_t _name_len;
+    char name[_name_len];
+  } children[_child_count];
+};
+
+struct DATAGRBIv25 __transparent : DATAGRBIv24 {
+  float matrix[3][4];
+};

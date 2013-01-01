@@ -1,0 +1,14 @@
+struct DATAMSHIv1 __transparent {
+  uint32_t _str_len;
+  char str[_str_len];
+};
+
+struct DATABMSHv1 __transparent {
+  uint32_t _vertex_count;
+  uint32_t _index_count;
+  struct {
+    __label("#%d : (%.1f, %.1f, %.1f)", _v, x, y, z);
+    float x, y, z;
+  } verticies[_vertex_count as _v];
+  uint16_t indicies[_index_count];
+};
