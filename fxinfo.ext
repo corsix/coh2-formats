@@ -1,5 +1,25 @@
 __external enum fxstr : uint32_t; // Magic to use the adjacent .fxstr file to resolve hashes.
 
+struct DATADESCv1 __transparent {
+  uint32_t unknown[4];
+  uint32_t num_techniques;
+  struct {
+    uint32_t num_textures;
+    struct {
+      __label("slot %u: %s[%u]", vs_slot, hash, dimension);
+      fxstr hash;
+      uint32_t unknown = 1;
+      uint32_t vs_slot;
+      uint32_t gs_slot = vs_slot;
+      uint32_t ps_slot = vs_slot;
+      uint32_t hs_slot = vs_slot;
+      uint32_t ds_slot = vs_slot;
+      uint32_t cs_slot = vs_slot;
+      uint8_t dimension;
+    } textures[num_textures];
+  } _extention[];
+};
+
 enum DataType : uint32_t {
   int = 0,
   float = 1,
