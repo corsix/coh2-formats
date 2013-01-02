@@ -13,7 +13,7 @@ struct RelicChunk {
     __id("%s%sv%d", _kind, _type, _version);
     uint8_t _data[_data_size] __interpret_as("RelicChunk[]");
   default:
-    uint8_t data[_data_size] __interpret_as("%s%sv%d", _kind, _type, _version);
+    uint8_t data[_data_size] __interpret_as("\"%s%sv%d\"", _kind, _type, _version);
   }
 };
 
