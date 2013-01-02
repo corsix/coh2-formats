@@ -1,0 +1,29 @@
+struct FOLDCMPSv3 > DATACHRCv1 __transparent {
+  uint32_t _num_channels;
+  uint32_t data_len;
+  struct {
+    uint32_t _name_len;
+    char _name[_name_len];                       struct{
+    uint32_t keyframe_data_type;
+    uint32_t num_keyframes;
+    uint32_t _data_offset;
+    uint32_t _timings_offset;
+    float duration;
+    
+    __byte_offset(&data, _data_offset);
+    switch(keyframe_data_type) {
+    case 4:
+      float keyframe_data[7][num_keyframes];
+    case 5:
+      float matrix[3][4];
+      uint32_t keyframe_data[num_keyframes];
+    }
+    __byte_offset(&data, _timings_offset);
+    float keyframe_timings[num_keyframes];
+    __byte_offset(&duration, 4);                 }[1];
+    
+  } _channels[_num_channels];
+  uint8_t data[data_len];
+};
+// The "struct{" and "}[1];" are a hack to take advantage of the semantics of arrays of fixed-size structures.
+// Without it, the instantiator isn't (yet) clever enough to allow you to use "&data" before "data" is defined.
