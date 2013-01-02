@@ -7,8 +7,7 @@ struct FOLDTSETv1 > DATADATAv3 __transparent {
 // FOLDMGRP
 /*
   Has N children of type FOLDMESH, and then N children of type DATANODE.
-  The enclosing FOLDMODL will have N FOLDMTRLs.
-  These three lists of N elements zip together.
+  These lists of N elements zip together.
 */
 
 struct FOLDMRGMv3 > DATADATAv8 #0 __transparent {
