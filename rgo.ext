@@ -47,6 +47,10 @@ struct DATACNBPv3 __transparent {
     }
   } _children[_child_count];
   uint32_t unknown[_child_count];
+  
+  // Each child has two unknown fields (the uint8_t in _children, and the uint32_t in unknown). Possible theories for their meanings:
+  // 1. An is_negated flag.
+  // 2. Whether the value is same as the corresponding default in DATADTBPv3 and should also change if the default changes.
 };
 
 struct DATAMOTNv3 {
