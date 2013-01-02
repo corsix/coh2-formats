@@ -76,32 +76,13 @@ struct FOLDSKELv3 > DATAINFOv1 __transparent {
   uint32_t bone_count;
 };
 
-struct Property {
-  uint32_t _key_len;
-  char key[_key_len];
-  uint32_t data_type;
-  switch(data_type) {
-  case 0:
-    int32_t value;
-  case 1:
-    float value;
-  case 10:
-    uint8_t value;
-  case 11:
-    uint32_t _value_len;
-    char value[_value_len];
-  default:
-    uint32_t unknown = "TODO";
-  }
-};
-
 struct FOLDSKELv3 > DATABONEv7 __transparent {
   int32_t parent;
   int32_t unknown;
   float matrix[3][4];
   uint32_t unknown;
   uint32_t _num_properties;
-  Property properties[_num_properties];
+  RGM_Property properties[_num_properties];
 };
 
 struct FOLDMTRLv1 > DATAINFOv1 __transparent {
@@ -140,6 +121,6 @@ struct FOLDMODLv1 > DATAMRKSv1 __transparent {
     char bone_name[_bone_name_len];
     float matrix[3][4];
     uint32_t _num_properties;
-    Property properties[_num_properties];
+    RGM_Property properties[_num_properties];
   } _markers[_num_markers];
 };

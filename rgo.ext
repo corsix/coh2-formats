@@ -1,0 +1,119 @@
+struct FOLDMTRXv3 > DATAINFOv4 {
+  uint8_t one = 1;
+  uint32_t _str_len;
+  char str[_str_len];
+  uint8_t unknown[22];
+  uint32_t _child_count;
+  struct {
+    uint32_t _name_len;
+    char name[_name_len];
+    float unknown[6];
+  } children[_child_count];
+};
+
+struct FOLDTRNSv1 > DATADATAv4 {
+  __label("%s -> %s (%s, %s)", from, to, f1, f2);
+  uint32_t unknown;
+  uint32_t _from_len;
+  char from[_from_len];
+  uint32_t _to_len;
+  char to[_to_len];
+  float f1;
+  uint8_t unknown;
+  uint32_t unknown;
+  float f2;
+};
+
+struct DATACNBPv3 __transparent {
+  uint32_t _child_count;
+  struct {
+    uint32_t data_type;
+    uint8_t unknown;
+    uint32_t _key_len;
+    char _key[_key_len];
+    switch(data_type)
+    {
+    case 1:
+      // No value
+    case 2:
+      uint32_t _value_len;
+      uint8_t value[_value_len];
+    case 3:
+      float value;
+      uint32_t unknown;
+    case 4:
+      float value1;
+      float value2;
+    }
+  } _children[_child_count];
+  uint32_t unknown[_child_count];
+};
+
+struct DATAMOTNv3 {
+  uint32_t _str_len;
+  char str[_str_len];
+  float matrix[3][4][];
+};
+
+struct FOLDMRKGv1 > DATADATAv1 __transparent {
+  uint32_t _marker_count;
+  struct {
+    uint32_t _name_len;
+    char _name[_name_len];
+  } _markers[_marker_count];
+};
+
+struct DATADTBPv3 __transparent {
+  uint32_t _num_tags;
+  struct {
+    __label("tag %s", name);
+    uint32_t _name_len;
+    char name[_name_len];
+  } _tags[_num_tags];
+  uint32_t _num_enums;
+  struct {
+    __label("enum %s (default %s)", name, default_value);
+    uint32_t _name_len;
+    char name[_name_len];
+    uint32_t _num_values;
+    struct {
+      uint32_t _value_len;
+      char value[_value_len];
+    } values[_num_values];
+    uint32_t _default_value_len;
+    char default_value[_default_value_len];
+  } _enums[_num_enums];
+  uint32_t _num_floats;
+  struct {
+    __label("float %s (default %s, range [%s, %s])", name, default_value, min, max);
+    uint32_t _name_len;
+    char name[_name_len];
+    float default_value;
+    float min;
+    float max;
+  } _floats[_num_floats];
+};
+
+struct DATACUATv1 __transparent {
+  uint32_t _num_properties;
+  RGM_Property _properties[_num_properties];
+};
+
+struct FOLDMSBPv1 > "DATAMSD v1" __transparent {
+  uint32_t num_msd_v2;
+  /*
+    The enclosing folder has this number of "DATAMSD v2" children, and this number of "DATACNBPv3" children.
+    These zip together, with each "DATAMSD v2" giving a list of objects in the model, and the corresponding
+    "DATACNBPv3" (presumably) giving the conditions required for those objects to be visible.
+  */
+};
+
+struct FOLDMSBPv1 > "DATAMSD v2" {
+  uint32_t _name_len;
+  char name[_name_len];
+  uint32_t _num_objects;
+  struct {
+    uint32_t _object_name_len;
+    char object_name[_object_name_len]; // NB: Is always lowercase, whereas the object name in the model file can be mixed case.
+  } objects[_num_objects];
+};
