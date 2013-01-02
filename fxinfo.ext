@@ -31,16 +31,105 @@ enum DataType : uint32_t {
   texture = 9,
 };
 
+struct ParmElement7 {
+  __label("%s %s[%u]", data_type, hash, array_size);
+  fxstr hash;
+  DataType data_type;
+  uint32_t array_size;
+  uint32_t unknown1;
+  uint32_t unknown2;
+};
+
+struct ParmElement8 {
+  __label("%s %s[%u]", data_type, hash, array_size);
+  fxstr hash;
+  DataType data_type;
+  uint32_t array_size;
+  uint32_t byte_offset;
+  uint32_t unknown1;
+  uint32_t unknown2;
+};
+
 struct DATAPARMv1 __transparent {
+  // The version of this chunk is always v1, but the format depends on whether
+  // the adjacent DATATECH is v7 or v8. As the definition language doesn't have
+  // sibling constraints, the following hack differentiates between the two.
+  uint32_t _dummy[5];
+  uint32_t _discriminant;
+  __byte_offset(&_dummy, 0);
+  switch(_discriminant) {
+  case  0: ParmElement8 _elements[];
+  case  1: ParmElement8 _elements[];
+  default: ParmElement7 _elements[];
+  }
+};
+
+struct UInt32 {
+  __label("%u", _value);
+  uint32_t _value;
+};
+
+struct TechniquePassChild {
+  __label("%s", hash);
+  fxstr hash;
+  uint32_t unknown;
+  uint32_t fst = 65535;
+  uint32_t snd = 65535;
+  uint32_t unknown;
+  uint32_t third = 65535;
+  uint32_t fourth = 65535;
+  uint32_t fifth = 65535;
+  uint8_t final = 1;
+};
+
+struct TechniqueProperty {
+  __label("%s", hash);
+  fxstr hash;
+  uint32_t data_type;
+  uint32_t _value_len;
+  uint8_t value[_value_len];
+};
+
+struct DATATECHv7 __transparent {
   struct {
-    __label("%s %s[%u]", data_type, hash, array_size);
-    fxstr hash;
-    DataType data_type;
-    uint32_t array_size;
-    uint32_t byte_offset;
-    uint32_t unknown1;
-    uint32_t unknown2;
-  } _elements[];
+    uint32_t _discriminant;
+    __byte_offset(&_discriminant, 0);
+    switch(_discriminant) {
+    case 0:
+    default:
+      __label("#%d: %s (%s)", _t, hash, second_hash);
+      fxstr hash;
+      fxstr second_hash;
+      uint32_t _list1_len;
+      uint32_t _list2_len;
+      uint32_t _list3_len;
+      uint32_t unknown1;
+      uint32_t unknown2 = 0;
+      uint32_t unknown3;
+      uint32_t unknown4 = 0;
+      uint32_t _list4_len;
+      uint32_t unknown5;
+      uint32_t unknown6 = 0;
+      uint32_t _num_passes;
+      uint32_t _prop_count;
+      UInt32 list1[_list1_len]; // Possibly a list of parameter indicies.
+      UInt32 list2[_list2_len]; // Almost certainly not a list of parameter indicies.
+      UInt32 list3[_list3_len]; // Possibly a list of parameter indicies.
+      UInt32 list4[_list4_len]; // Possibly a list of parameter indicies.
+      struct {
+        __label("#%d", _p);
+        uint32_t unknown = 24;
+        uint32_t _child_count;
+        uint8_t unknown[444];
+        TechniquePassChild children[_child_count];
+      } passes[_num_passes as _p];
+      TechniqueProperty props[_prop_count];
+    }
+  } techniques[as _t]; // The length of this array is given by DATADESCv1.num_techniques, but as that cannot be specified, the _discriminant hack is used to detect techniques_aux[0].zero.
+  struct {
+    __label("#%d", _t);
+    uint32_t zero = 0;
+  } techniques_aux[as _t];
 };
 
 struct DATATECHv8 __transparent {
@@ -67,25 +156,8 @@ struct DATATECHv8 __transparent {
       uint32_t unknown = 24;
       uint32_t _child_count;
       uint8_t unknown[444];
-      struct {
-        __label("%s", hash);
-        fxstr hash;
-        uint32_t zero = 0;
-        uint32_t fst = 65535;
-        uint32_t snd = 65535;
-        uint32_t unknown;
-        uint32_t third = 65535;
-        uint32_t fourth = 65535;
-        uint32_t fifth = 65535;
-        uint8_t final = 1;
-      } children[_child_count];
+      TechniquePassChild children[_child_count];
     } passes[_num_passes as _p];
-    struct {
-      __label("%s", hash);
-      fxstr hash;
-      uint32_t data_type;
-      uint32_t _value_len;
-      uint8_t value[_value_len];
-    } props[_prop_count];
+    TechniqueProperty props[_prop_count];
   } techniques[as _t];
 };
