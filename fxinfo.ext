@@ -1,7 +1,8 @@
 __external enum fxstr : uint32_t; // Magic to use the adjacent .fxstr file to resolve hashes.
 
 struct DATADESCv1 __transparent {
-  uint32_t unknown[4];
+  uint32_t default_technique;
+  uint32_t unknown[3];
   uint32_t num_techniques;
   struct {
     uint32_t num_textures;
