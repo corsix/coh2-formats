@@ -59,6 +59,38 @@ struct DATAMOTNv3 {
   float matrix[3][4][];
 };
 
+struct DATAEVNTv2 {
+  uint32_t _str1_len;
+  char str1[_str1_len];
+  float unknown;
+  uint32_t _str2_len;
+  char str2[_str2_len];
+};
+
+struct DATAACTNv3 __transparent {
+  uint32_t _count;
+  struct {
+    uint32_t _name_len;
+    char _name[_name_len];
+    uint32_t _child_count;
+    struct {
+      __label("%s = %s", key, value);
+      uint32_t _key_len;
+      char key[_key_len];
+      uint32_t _value_len;
+      char value[_value_len];
+    } _children[_child_count];
+    float unknown; // Possibly a delay?
+  } [_count];
+};
+
+struct DATABBPDv1 __transparent {
+  uint32_t _str1_len;
+  char str1[_str1_len];
+  uint32_t _str2_len;
+  char str2[_str2_len];
+};
+
 struct FOLDMRKGv1 > DATADATAv1 __transparent {
   uint32_t _marker_count;
   struct {
