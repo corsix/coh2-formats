@@ -13,7 +13,7 @@ struct FOLDCMPSv3 > DATACHRCv1 __transparent {
     __byte_offset(&data, _data_offset);
     switch(keyframe_data_type) {
     case 4:
-      float keyframe_data[7][num_keyframes];
+      float keyframe_data[7][num_keyframes]; // 7 values might be: float3 translation, float3 unit, float angle.
     case 5:
       float matrix[3][4];
       uint32_t keyframe_data[num_keyframes];
