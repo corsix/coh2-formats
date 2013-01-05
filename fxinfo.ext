@@ -133,25 +133,40 @@ struct DATATECHv7 __transparent {
   } techniques_aux[as _t];
 };
 
+struct TechniqueID {
+  int16_t technique_id;
+  uint16_t _padding = 0;
+};
+
+struct SkeletalVariants {
+  TechniqueID without_skeleton;
+  TechniqueID with_skeleton;
+};
+
+struct Unknown4Variants {
+  SkeletalVariants without_unknown4;
+  SkeletalVariants with_unknown4;
+};
+
+struct TexCoord9Variants {
+  Unknown4Variants without_texcoord9;
+  Unknown4Variants with_texcoord9;
+};
+
 struct DATATECHv8 __transparent {
   struct {
-    __label("#%d: %s (%s [%d,%d])", _t, hash, second_hash, unknown5, unknown3);
+    __label("#%d: %s (%s [%d,%d])", _t, hash, second_hash, uses_texcoord9, uses_skeleton);
     fxstr hash;
     fxstr second_hash;
     uint32_t _unknown1 = 1;
     uint32_t _unknown2 = 0;
-    uint32_t  unknown3;
+    uint32_t  uses_skeleton; // 1 if the associated vertex shaders use BLENDINDICES and BLENDWEIGHT, 0 if they do not
     uint32_t _unknown4 = 0;
-    uint32_t  unknown5;
+    uint32_t  uses_texcoord9; // 1 if the associated vertex shaders use TEXCOORD9, 0 if they do not
     uint32_t _unknown6 = 8;
     uint32_t _num_passes;
     uint32_t _prop_count;
-    uint32_t  primary_technique;
-    struct {
-      __label("primary variant %d: #%d", _i, technique_id);
-      int16_t technique_id;
-      uint16_t unknown = 0;
-    } _primary_variants[7 as _i];
+    TexCoord9Variants technique_variants;
     struct {
       __label("#%d", _p);
       uint32_t unknown = 24;
