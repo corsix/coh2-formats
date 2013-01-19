@@ -70,17 +70,17 @@ struct UInt32 {
   uint32_t _value;
 };
 
-struct TechniquePassChild {
+struct TechniquePassTexture {
   __label("%s", hash);
   fxstr hash;
-  uint32_t unknown;
-  uint32_t fst = 65535;
-  uint32_t snd = 65535;
-  uint32_t unknown;
-  uint32_t third = 65535;
-  uint32_t fourth = 65535;
-  uint32_t fifth = 65535;
-  uint8_t final = 1;
+  uint32_t flags; // Either 0 or 2. Is always 0 in DATATECHv8.
+  uint32_t _vs_slot = 65535;
+  uint32_t _gs_slot = 65535;
+  uint32_t ps_slot;
+  uint32_t _hs_slot = 65535;
+  uint32_t _ds_slot = 65535;
+  uint32_t _cs_slot = 65535;
+  uint8_t _unknown = 1;
 };
 
 struct TechniqueProperty {
@@ -122,7 +122,7 @@ struct DATATECHv7 __transparent {
         uint32_t unknown = 24;
         uint32_t _child_count;
         uint8_t unknown[444];
-        TechniquePassChild children[_child_count];
+        TechniquePassTexture textures[_child_count];
       } passes[_num_passes as _p];
       TechniqueProperty props[_prop_count];
     }
@@ -172,7 +172,7 @@ struct DATATECHv8 __transparent {
       uint32_t unknown = 24;
       uint32_t _child_count;
       uint8_t unknown[444];
-      TechniquePassChild children[_child_count];
+      TechniquePassTexture textures[_child_count];
     } passes[_num_passes as _p];
     TechniqueProperty props[_prop_count];
   } techniques[as _t];
