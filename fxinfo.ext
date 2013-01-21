@@ -2,7 +2,9 @@ __external enum fxstr : uint32_t; // Magic to use the adjacent .fxstr file to re
 
 struct DATADESCv1 __transparent {
   uint32_t default_technique;
-  uint32_t unknown[3];
+  uint32_t unknown;
+  uint32_t num_ps_parameters;
+  uint32_t num_vs_parameters;
   uint32_t num_techniques;
   struct {
     uint32_t num_textures;
@@ -63,6 +65,175 @@ struct DATAPARMv1 __transparent {
   case  1: ParmElement8 _elements[];
   default: ParmElement7 _elements[];
   }
+};
+
+enum D3D11_FILL_MODE : uint32_t {
+  wireframe = 2,
+  solid = 3,
+};
+
+enum D3D11_CULL_MODE : uint32_t {
+  no_culling = 1,
+  frontface_culling = 2,
+  backface_culling = 3,
+};
+
+enum D3D11_BLEND : uint32_t { 
+  "0"               = 1,
+  "1"               = 2,
+  "src.rgb"         = 3,
+  "(1 - src.rgb)"   = 4,
+  "src.a"           = 5,
+  "(1 - src.a)"     = 6,
+  "dest.a"          = 7,
+  "(1 - dest.a)"    = 8,
+  "dest.rgb"        = 9,
+  "(1 - dest.rgb)"  = 10,
+  src_alpha_sat     = 11,
+  "blend_factor"    = 14,
+  "(1 - blend_factor)" = 15,
+  src1_color        = 16,
+  inv_src1_color    = 17,
+  src1_alpha        = 18,
+  inv_src1_alpha    = 19,
+};
+
+enum D3D11_BLEND_OP : uint32_t { 
+  "+" = 1,
+  "-" = 2,
+  "`flip (-)`" = 3,
+  "`min`" = 4,
+  "`max`" = 5
+};
+
+enum D3D11_FILTER : uint32_t { 
+  min_mag_mip_point                           = 0,
+  min_mag_point_mip_linear                    = 1,
+  min_point_mag_linear_mip_point              = 4,
+  min_point_mag_mip_linear                    = 5,
+  min_linear_mag_mip_point                    = 16,
+  min_linear_mag_point_mip_linear             = 17,
+  min_mag_linear_mip_point                    = 20,
+  min_mag_mip_linear                          = 21,
+  anisotropic                                 = 85,
+  comparison_min_mag_mip_point                = 128,
+  comparison_min_mag_point_mip_linear         = 129,
+  comparison_min_point_mag_linear_mip_point   = 132,
+  comparison_min_point_mag_mip_linear         = 133,
+  comparison_min_linear_mag_mip_point         = 144,
+  comparison_min_linear_mag_point_mip_linear  = 145,
+  comparison_min_mag_linear_mip_point         = 148,
+  comparison_min_mag_mip_linear               = 149,
+  comparison_anisotropic                      = 213,
+};
+
+enum D3D11_TEXTURE_ADDRESS_MODE : uint32_t {
+  wrap         = 1,
+  mirror       = 2,
+  clamp        = 3,
+  border       = 4,
+  mirror_once  = 5,
+};
+
+enum D3D11_COMPARISON_FUNC : uint32_t { 
+  "`never`"  = 1,
+  "<"        = 2,
+  "=="       = 3,
+  "<="       = 4,
+  ">"        = 5,
+  "!="       = 6,
+  ">="       = 7,
+  "`always`" = 8,
+};
+
+enum D3D11_STENCIL_OP : uint32_t { 
+  keep      = 1,
+  zero      = 2,
+  replace   = 3,
+  incr_sat  = 4,
+  decr_sat  = 5,
+  invert    = 6,
+  incr      = 7,
+  decr      = 8,
+};
+
+struct DATASPUSv1 __transparent {
+  uint32_t _num_rasterizer_descs;
+  struct { // D3D11_RASTERIZER_DESC
+    __label("#%d: %s %s%s%s%s%s", _r, FillMode, CullMode, DepthClipEnable ? " depth_clip" : "", ScissorEnable ? " scissor" : "", MultisampleEnable ? " multisample" : "", AntialiasedLineEnable ? " aa_line" : "");
+    D3D11_FILL_MODE FillMode;
+    D3D11_CULL_MODE CullMode;
+    uint32_t        FrontCounterClockwise;
+    int32_t         DepthBias;
+    float           DepthBiasClamp;
+    float           SlopeScaledDepthBias;
+    uint32_t        DepthClipEnable;
+    uint32_t        ScissorEnable;
+    uint32_t        MultisampleEnable;
+    uint32_t        AntialiasedLineEnable;
+  } rasterizer_descs[_num_rasterizer_descs as _r];
+  uint32_t _num_blend_descs;
+  struct { // D3D11_BLEND_DESC
+    __label("#%d", _b);
+    uint32_t         AlphaToCoverageEnable;
+    uint32_t         IndependentBlendEnable;
+    struct __transparent {
+      uint32_t       _BlendEnable;
+      switch(_BlendEnable)
+      {
+      case 0:
+        __label("RenderTarget[%d] rgb=src.rgb a=src.a", _rt);
+        uint32_t       _unused[6];
+        uint32_t       RenderTargetWriteMask;
+      default:
+        __label("RenderTarget[%d] rgb=src.rgb*%s %s dest.rgb*%s, a=src.a*%s %s dest.a*%s", _rt, SrcBlend, BlendOp, DestBlend, SrcBlendAlpha, BlendOpAlpha, DestBlendAlpha);
+        D3D11_BLEND    SrcBlend;
+        D3D11_BLEND    DestBlend;
+        D3D11_BLEND_OP BlendOp;
+        D3D11_BLEND    SrcBlendAlpha;
+        D3D11_BLEND    DestBlendAlpha;
+        D3D11_BLEND_OP BlendOpAlpha;
+        uint32_t       RenderTargetWriteMask;
+      }
+    }[IndependentBlendEnable ? 8 : 1 as _rt];
+    uint32_t _unused[IndependentBlendEnable ? 0 : 7][8];
+  } blend_descs[_num_blend_descs as _b];
+  uint32_t _num_depth_stencil_descs;
+  struct { // D3D11_DEPTH_STENCIL_DESC
+    __label("#%d: depth_fn=%s%s", _d, DepthFunc, StencilEnable ? " stencil" : "");
+    uint32_t                   DepthEnable;
+    uint32_t                   DepthWriteEnable;
+    D3D11_COMPARISON_FUNC      DepthFunc;
+    uint32_t                   StencilEnable;
+    switch(StencilEnable) {
+    case 0:
+      uint8_t _unused[34];
+    default:
+      uint8_t                    StencilReadMask;
+      uint8_t                    StencilWriteMask;
+      struct {
+        __label("%sFace: stencil_fn=%s, if stencil_fail then %s elseif depth_fail then %s else %s", _face ? "Back" : "Front", StencilFunc, StencilFailOp, StencilDepthFailOp, StencilPassOp);
+        D3D11_STENCIL_OP      StencilFailOp;
+        D3D11_STENCIL_OP      StencilDepthFailOp;
+        D3D11_STENCIL_OP      StencilPassOp;
+        D3D11_COMPARISON_FUNC StencilFunc;
+      } [2 as _face];
+    }
+  } depth_stencil_descs[_num_depth_stencil_descs as _d];
+  uint32_t _num_sampler_descs;
+  struct { // D3D11_SAMPLER_DESC
+    __label("#%d: %s (%s,%s,%s)", _s, Filter, AddressU, AddressV, AddressW);
+    D3D11_FILTER               Filter;
+    D3D11_TEXTURE_ADDRESS_MODE AddressU;
+    D3D11_TEXTURE_ADDRESS_MODE AddressV;
+    D3D11_TEXTURE_ADDRESS_MODE AddressW;
+    float                      MipLODBias;
+    uint32_t                   MaxAnisotropy;
+    D3D11_COMPARISON_FUNC      ComparisonFunc;
+    float                      BorderColor[4];
+    float                      MinLOD;
+    float                      MaxLOD;
+  } sampler_descs[_num_sampler_descs as _s];
 };
 
 struct UInt32 {
