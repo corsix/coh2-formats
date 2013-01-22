@@ -262,6 +262,30 @@ struct TechniqueProperty {
   uint8_t value[_value_len];
 };
 
+struct SamplerList {
+  struct {
+    __label("#%d: %u", _i, value);
+    uint32_t value;
+  } [16 as _i];
+};
+
+struct TechniquePassData {
+  uint32_t _unknown_count = 24;
+  uint32_t _texture_count;
+  uint8_t unknown[_unknown_count];
+  uint32_t rasterizer_desc_index;
+  uint32_t blend_desc_index;
+  uint32_t depth_stencil_desc_index;
+  uint32_t stencil_ref_value;
+  float blend_factor[4];
+  uint32_t OM_sample_mask;
+  SamplerList vs_samplers, gs_samplers, ps_samplers;
+  uint32_t _hs_samplers[16] = 0;
+  uint32_t _ds_samplers[16] = 0;
+  uint32_t _cs_samplers[16] = 0;
+  TechniquePassTexture textures[_texture_count];
+};
+
 struct DATATECHv7 __transparent {
   struct {
     uint32_t _discriminant;
@@ -290,10 +314,7 @@ struct DATATECHv7 __transparent {
       UInt32 list4[_list4_len]; // Possibly a list of parameter indicies.
       struct {
         __label("#%d", _p);
-        uint32_t unknown = 24;
-        uint32_t _child_count;
-        uint8_t unknown[444];
-        TechniquePassTexture textures[_child_count];
+        TechniquePassData;
       } passes[_num_passes as _p];
       TechniqueProperty props[_prop_count];
     }
@@ -340,10 +361,7 @@ struct DATATECHv8 __transparent {
     TexCoord9Variants technique_variants;
     struct {
       __label("#%d", _p);
-      uint32_t unknown = 24;
-      uint32_t _child_count;
-      uint8_t unknown[444];
-      TechniquePassTexture textures[_child_count];
+      TechniquePassData;
     } passes[_num_passes as _p];
     TechniqueProperty props[_prop_count];
   } techniques[as _t];
