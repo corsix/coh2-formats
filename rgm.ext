@@ -10,6 +10,26 @@ struct FOLDTSETv1 > DATADATAv3 __transparent {
   These lists of N elements zip together.
 */
 
+enum SemanticCode : uint32_t {
+  POSITION = 0,
+  BLENDINDICES = 1,
+  BLENDWEIGHT = 2,
+  NORMAL = 3,
+  BINORMAL = 4,
+  TANGENT = 5,
+  COLOR = 6,
+  TEXCOORD0 = 8,
+  TEXCOORD1 = 9,
+  TEXCOORD9 = 14,
+};
+
+enum DxgiFormatCode : uint32_t {
+  B8G8R8A8_UNORM = 2,
+  R32G32_FLOAT = 3,
+  R32G32B32_FLOAT = 4,
+  R8G8B8A8_UINT = 13,
+};
+
 struct FOLDMRGMv3 > DATADATAv8 #0 __transparent {
   uint8_t unknown;
   uint32_t _num_objects;
@@ -23,10 +43,10 @@ struct FOLDMRGMv3 > DATADATAv8 #0 __transparent {
   } objects[_num_objects];
   uint32_t _num_input_layout_elements;
   struct {
-    uint32_t semantic;
-    uint32_t version;
-    uint32_t datatype;
-    __label("%d %d %d", semantic, version, datatype);
+    SemanticCode semantic;
+    uint32_t _unknown = 3;
+    DxgiFormatCode datatype;
+    __label("%s %s", datatype, semantic);
   } input_layout_elements[_num_input_layout_elements];
   uint32_t num_verticies;
   uint32_t vertex_stride;
