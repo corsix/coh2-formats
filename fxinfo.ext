@@ -2,10 +2,14 @@ __external enum fxstr : uint32_t; // Magic to use the adjacent .fxstr file to re
 
 struct DATADESCv1 __transparent {
   uint32_t default_technique;
-  uint32_t unknown;
+  // The version of this chunk is always v1, but the format depends on whether
+  // the adjacent DATATECH is v7 or v8. In v7, the following field is not present.
+  uint32_t has_SingleInstanceInfoBuffer;
   uint32_t num_ps_parameters;
-  uint32_t num_vs_parameters;
+  uint32_t num_shared_parameters;
+  // uint32_t flags; // v7 only.
   uint32_t num_techniques;
+  // The following extension is never present in v7 and always present in v8.
   struct {
     uint32_t num_textures;
     struct {
@@ -20,7 +24,7 @@ struct DATADESCv1 __transparent {
       uint32_t cs_slot = vs_slot;
       uint8_t dimension;
     } textures[num_textures];
-  } _extention[];
+  } _extension[];
 };
 
 enum DataType : uint32_t {
@@ -304,7 +308,7 @@ struct DATATECHv7 __transparent {
       uint32_t unknown3;
       uint32_t unknown4 = 0;
       uint32_t _list4_len;
-      uint32_t unknown5;
+      uint32_t max_num_bones;
       uint32_t unknown6 = 0;
       uint32_t _num_passes;
       uint32_t _prop_count;
